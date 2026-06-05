@@ -18,7 +18,7 @@ if "rag" not in st.session_state:
     if api_key:
         st.session_state.rag = RAGPipeline(api_key=api_key)
     else:
-        st.error("GROQ_API_KEY не найден в переменных окружения.")
+        st.error("GROQ_API_KEY is not found in environment variables.")
 
 # Sidebar for uploading and indexing PDF
 with st.sidebar:
