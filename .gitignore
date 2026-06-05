@@ -6,3 +6,4 @@ papers/
 data/
 *.pdf
 venv/
+paper_chat.ipynb
