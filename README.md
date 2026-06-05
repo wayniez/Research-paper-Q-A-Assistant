@@ -1,7 +1,5 @@
 # 📄 Scientific Paper Q&A Assistant (RAG)
 
-# 📄 Scientific Paper Q&A Assistant (RAG)
-
 A production-ready, cloud-deployed **Retrieval-Augmented Generation (RAG)** application designed to parse academic papers and scientific PDF publications, enabling users to extract accurate, context-aware answers with transparent source citations.
 
 🚀 **Live Demo:** https://research-paper-q-a-assistant.streamlit.app/
