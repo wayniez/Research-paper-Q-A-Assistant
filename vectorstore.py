@@ -7,16 +7,19 @@ from typing import List
 
 class VectorStore:
     def __init__(self):
+
+        try:
+            import chromadb.api.client
+            chromadb.api.client.SharedSystemClient.clear_system_cache()
+        except Exception:
+            pass
+        
         self.client = chromadb.Client()
         self.model = SentenceTransformer('all-MiniLM-L6-v2')
         self.collection = self.client.get_or_create_collection(
             name='papers',
             metadata={'hnsw:space': 'cosine'}
         )
-        try:
-            chromadb.api.client.SharedSystemClient.clear_system_cache()
-        except Exception:
-            pass
 
     def add_chunks(self, chunks: List[str], source: str):
         embeddings = self.model.encode(chunks).tolist()
