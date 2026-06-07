@@ -1,6 +1,10 @@
-__import__('pysqlite3')
-import sys
-sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+try:
+    # Trying to use pysqlite3 instead of the built-in sqlite3 to avoid "disk I/O error" in Streamlit Cloud
+    __import__('pysqlite3')
+    import sys
+    sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+except ModuleNotFoundError:
+    pass
 
 import os
 import tempfile
@@ -45,6 +49,7 @@ with st.sidebar:
                     st.error(f"Error: {e}")
                 finally:
                     os.unlink(tmp_file_path)
+
     st.divider()
     st.header("2. Settings")
     n_results = st.slider(
@@ -64,6 +69,25 @@ with st.sidebar:
         type="password",
         help="Leave blank to use the developer's demo key. Enter your own if you hit rate limits."
     )
+
+    st.markdown("---") # Визуальный разделитель
+    st.subheader("🧹 Session Management")
+    
+    # Button to clear chat history and RAG memory, with appropriate handling in session state
+    # Button should clear both the chat history and the RAG pipeline's vector store to ensure a fresh start
+    if st.button("Clear Chat History", use_container_width=True, type="secondary", key="clear_chat_button"):
+        #  1. Clear the chat history in session state
+        st.session_state.chat_history = []
+        
+        #  2. Clear the RAG pipeline's vector store by re-initializing it (if it exists)
+        if "rag" in st.session_state:
+            api_key = st.session_state.get("current_key") or os.environ.get("GROQ_API_KEY")
+            if api_key:
+                from rag_engine import RAGPipeline
+                st.session_state.rag = RAGPipeline(api_key=api_key)
+        
+        # 3. Rerun the app to reflect the cleared state immediately
+        st.rerun()
     
     # 1. Determine which API key to use (user-provided or demo)
     if user_key:
