@@ -45,11 +45,47 @@ with st.sidebar:
     st.header("2. Settings")
     n_results = st.slider(
         "Context chunks",
-        min_value=1,
+        min_value=1,    
         max_value=10,
         value=4,
         help="More chunks = more context, but slower response"
     )
+
+    with st.sidebar:
+        st.subheader("🔑 Authentication")
+    
+    # Field for user to input their own Groq API key, with a note about using the demo key if left blank
+    user_key = st.text_input(
+        "Groq API Key (Optional)", 
+        type="password",
+        help="Leave blank to use the developer's demo key. Enter your own if you hit rate limits."
+    )
+    
+    # 1. Determine which API key to use (user-provided or demo)
+    if user_key:
+        final_key = user_key
+        key_source = "user"
+    elif "GROQ_API_KEY" in st.secrets:
+        final_key = st.secrets["GROQ_API_KEY"]
+        key_source = "developer"
+    else:
+        final_key = None
+        key_source = None
+
+    # 2. initialize RAG pipeline with the determined API key, and show status messages
+    if final_key:
+        # Check if RAG pipeline needs to be initialized or re-initialized (if the key has changed)
+        if "rag" not in st.session_state or st.session_state.get("current_key") != final_key:
+            st.session_state.rag = RAGPipeline(api_key=final_key)
+            st.session_state.current_key = final_key # Remember the current key in session state to avoid unnecessary reinitialization
+            
+        # provide feedback to the user about which key is being used
+        if key_source == "developer":
+            st.info("💡 Running on demo API key (limits apply).")
+        else:
+            st.success("✅ Using your custom API key.")
+    else:
+        st.error("⚠️ No API key found. Please configure st.secrets or enter a custom Groq key.")
 
 # Main chat interface
 st.header("2. Ask Questions")
