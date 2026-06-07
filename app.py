@@ -41,6 +41,15 @@ with st.sidebar:
                     st.error(f"Error: {e}")
                 finally:
                     os.unlink(tmp_file_path)
+    st.divider()
+    st.header("2. Settings")
+    n_results = st.slider(
+        "Context chunks",
+        min_value=1,
+        max_value=10,
+        value=4,
+        help="More chunks = more context, but slower response"
+    )
 
 # Main chat interface
 st.header("2. Ask Questions")
@@ -68,7 +77,7 @@ if user_query := st.chat_input("Ask a question about the uploaded paper..."):
     with st.chat_message("assistant"):
         with st.spinner("Analyzing the paper..."):
             # Receive both the response and the list of chunks used as sources
-            answer, sources = st.session_state.rag.ask(user_query, st.session_state.chat_history[:-1])
+            answer, sources = st.session_state.rag.ask(user_query, st.session_state.chat_history[:-1], n_results=n_results)
             
             st.write(answer)
             
